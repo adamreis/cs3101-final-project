@@ -10,4 +10,8 @@
 
 @interface NotedTableViewController : UITableViewController
 
+@property (strong, nonatomic) NSMutableArray *notes;
+
+- (instancetype)initWithNotes: (NSMutableArray *)notes;
+
 @end

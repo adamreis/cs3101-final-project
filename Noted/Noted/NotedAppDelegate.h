@@ -7,9 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NotedTableViewController.h"
 
 @interface NotedAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+@property (strong, nonatomic) NotedTableViewController *tableVC;
 
 @end

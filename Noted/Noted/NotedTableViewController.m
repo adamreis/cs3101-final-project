@@ -10,10 +10,7 @@
 #import "Note.h"
 #import "NotedNoteViewController.h"
 
-@interface NotedTableViewController ()
-
-//@property (nonatomic, strong) UITableView *tableView;
-@property (strong, nonatomic) NSMutableArray *notes;
+@interface NotedTableViewController () <NotedNoteViewControllerDelegate>
 
 
 @end
@@ -21,32 +18,10 @@
 @implementation NotedTableViewController
 
 
-- (instancetype)init
+- (instancetype)initWithNotes: (NSMutableArray *)notes
 {
     if (self = [self initWithNibName:nil bundle:nil]) {
-        self.notes = [NSMutableArray array];
-//        CGRect textFieldRect = CGRectMake(0,0,100,100);
-//        self.textField = [[UITextField alloc] initWithFrame:textFieldRect];
-    }
-    return self;
-}
-
-//- (void)loadView
-//{
-//    [super loadView];
-//    
-//    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
-//    tableView.dataSource = self;
-//    tableView.delegate = self;
-//    [self.view addSubview:tableView];
-//    self.tableView = tableView;
-//}
-
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
+        self.notes = notes;
     }
     return self;
 }
@@ -59,21 +34,13 @@
     
     UIBarButtonItem *newNoteButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed:)];
     self.navigationItem.rightBarButtonItem = newNoteButton;
-    
-//    [window addSubview:]
 }
 
 - (void)addButtonPressed:(UIBarButtonItem *)sender
 {
     UIAlertView *newNoteAlert = [[UIAlertView alloc] initWithTitle:@"add new note"  message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"add note", nil];
     newNoteAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    
-//    UITextField *titleTextField = [[UITextField alloc] initWithFrame:CGRectMake(12.0, 45.0, 260.0, 25.0)];
-//    titleTextField.placeholder = @"NEW TITLE, YO";
-//    [titleTextField becomeFirstResponder];
-//    [titleTextField setBackgroundColor:[UIColor blueColor]];
-//    
-//    [newNoteAlert addSubview:titleTextField];
+
     [newNoteAlert show];
 }
 
@@ -83,11 +50,13 @@
     Note *newNote = [[Note alloc] init];
     newNote.title = alertTextField.text;
     newNote.index = self.notes.count;
-//    [self.notes addObject:alertTextField.text];
     [self.notes addObject:newNote];
     NSLog(@"%@", self.notes);
     [self.tableView reloadData];
     
+    NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNote:newNote];
+    noteVC.delegate = self;
+    [self.navigationController pushViewController:noteVC animated:YES];
 }
 
 
@@ -99,12 +68,10 @@
 
 #pragma mark - Table view data source
 
-//- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-//{
-//#warning Potentially incomplete method implementation.
-//    // Return the number of sections.
-//    return 0;
-//}
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -125,7 +92,7 @@
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNote:self.notes[indexPath.row]];
     noteVC.delegate = self;
@@ -136,10 +103,9 @@
 - (void)inputController:(NotedNoteViewController *)controller didFinishWithNote:(Note *)note
 {
     self.notes[note.index] = note;
-
-//    [self.tableView reloadData];
-//    [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+
 
 /*
 // Override to support conditional editing of the table view.
