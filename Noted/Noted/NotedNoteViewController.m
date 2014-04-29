@@ -33,6 +33,7 @@
     
     self.title = self.note.title;
     self.noteTextField.text = self.note.text;
+    [self.noteTextField becomeFirstResponder];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

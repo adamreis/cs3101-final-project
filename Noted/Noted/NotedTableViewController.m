@@ -12,7 +12,6 @@
 
 @interface NotedTableViewController () <NotedNoteViewControllerDelegate>
 
-
 @end
 
 @implementation NotedTableViewController
@@ -40,23 +39,24 @@
 {
     UIAlertView *newNoteAlert = [[UIAlertView alloc] initWithTitle:@"add new note"  message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"add note", nil];
     newNoteAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
-
+//    [newNoteAlert textFieldAtIndex:0].delegate = self;
     [newNoteAlert show];
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    
-    UITextField * alertTextField = [alertView textFieldAtIndex:0];
-    Note *newNote = [[Note alloc] init];
-    newNote.title = alertTextField.text;
-    newNote.index = self.notes.count;
-    [self.notes addObject:newNote];
-    NSLog(@"%@", self.notes);
-    [self.tableView reloadData];
-    
-    NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNote:newNote];
-    noteVC.delegate = self;
-    [self.navigationController pushViewController:noteVC animated:YES];
+    if (buttonIndex == 1) {
+        UITextField * alertTextField = [alertView textFieldAtIndex:0];
+        Note *newNote = [[Note alloc] init];
+        newNote.title = alertTextField.text;
+        newNote.index = self.notes.count;
+        [self.notes addObject:newNote];
+        NSLog(@"%@", self.notes);
+        [self.tableView reloadData];
+        
+        NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNote:newNote];
+        noteVC.delegate = self;
+        [self.navigationController pushViewController:noteVC animated:YES];
+    }
 }
 
 
@@ -105,6 +105,10 @@
     self.notes[note.index] = note;
 }
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+//    [textField resignFirstResponder];
+    return NO;
+}
 
 
 /*
