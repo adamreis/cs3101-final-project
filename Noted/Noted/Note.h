@@ -12,6 +12,9 @@
 
 @property (nonatomic) NSString *title;
 @property (nonatomic) NSString *text;
+@property (nonatomic) NSString *path;
 @property (nonatomic) NSInteger index;
+
+- (id)initWithTitle:(NSString *)title text:(NSString *)text index:(NSInteger)index path:(NSString *)path;
 
 @end

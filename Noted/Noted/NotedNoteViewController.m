@@ -12,17 +12,28 @@
 @interface NotedNoteViewController ()
 
 @property (strong, nonatomic) Note *note;
+@property (weak, nonatomic) NSString *filePath;
 @property (weak, nonatomic) IBOutlet UITextView *noteTextField;
+
 
 @end
 
 @implementation NotedNoteViewController
 
-- (instancetype)initWithNote:(Note *)note
+- (instancetype)initWithNotePath:(NSString *)path
 {
     if (self = [self initWithNibName:@"NotedNoteViewController" bundle:nil])
     {
-        self.note = note;
+//        sleep(5);
+        self.filePath = path;
+        if ([[NSFileManager defaultManager] fileExistsAtPath:self.filePath]) {
+            NSData *data = [NSData dataWithContentsOfFile:self.filePath];
+            self.note = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        } else {
+            self.note = [[Note alloc] init];
+            self.note.index = -1; // indicate an error
+            NSLog(@"Cannot find file at: %@", self.filePath);
+        }
     }
     return self;
 }
@@ -30,6 +41,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    if (self.note.index == -1) {
+        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"There was an error loading your saved note!"  message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles: nil];
+        [errorAlert show];
+    }
     
     self.title = self.note.title;
     self.noteTextField.text = self.note.text;
@@ -37,13 +52,17 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-    
     if (animated) {
         self.note.text = self.noteTextField.text;
-        [self.delegate inputController:self didFinishWithNote:self.note];
+        [NSKeyedArchiver archiveRootObject:self.note toFile:self.filePath];
+        
+//        [self.delegate inputController:self didFinishWithNote:self.note];
     }
+    
+    
+    [super viewDidDisappear:animated];
 }
+
 
 
 - (void)didReceiveMemoryWarning

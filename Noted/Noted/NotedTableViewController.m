@@ -12,6 +12,8 @@
 
 @interface NotedTableViewController () <NotedNoteViewControllerDelegate>
 
+@property (strong, nonatomic) NSMutableArray *notes;
+
 @end
 
 @implementation NotedTableViewController
@@ -46,14 +48,24 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if (buttonIndex == 1) {
         UITextField * alertTextField = [alertView textFieldAtIndex:0];
-        Note *newNote = [[Note alloc] init];
-        newNote.title = alertTextField.text;
-        newNote.index = self.notes.count;
+        
+        NSArray *directories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documents = [directories firstObject];
+        NSString *uuid = [[NSUUID UUID] UUIDString];
+        NSString *filePathNewNote = [documents stringByAppendingPathComponent:[uuid stringByAppendingPathExtension:@"plist"]];
+        NSString *filePathNotes = [documents stringByAppendingPathComponent:@"notes.plist"];
+        
+        Note *newNote = [[Note alloc] initWithTitle:alertTextField.text text:@"" index:self.notes.count path:filePathNewNote];
+
         [self.notes addObject:newNote];
-        NSLog(@"%@", self.notes);
         [self.tableView reloadData];
         
-        NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNote:newNote];
+        [NSKeyedArchiver archiveRootObject:newNote toFile:filePathNewNote];
+        [NSKeyedArchiver archiveRootObject:self.notes toFile:filePathNotes]; 
+        
+        
+        
+        NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNotePath:newNote.path];
         noteVC.delegate = self;
         [self.navigationController pushViewController:noteVC animated:YES];
     }
@@ -94,7 +106,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNote:self.notes[indexPath.row]];
+    Note *note = [self.notes objectAtIndex:indexPath.row];
+    NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNotePath:note.path];
     noteVC.delegate = self;
     [self.navigationController pushViewController:noteVC animated:YES];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -102,7 +115,7 @@
 
 - (void)inputController:(NotedNoteViewController *)controller didFinishWithNote:(Note *)note
 {
-    self.notes[note.index] = note;
+    [self.notes replaceObjectAtIndex:note.index withObject:note];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
