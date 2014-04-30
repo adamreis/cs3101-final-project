@@ -6,7 +6,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NotedNoteViewController">
             <connections>
-                <outlet property="noteTextField" destination="lEd-xT-uic" id="YIk-tZ-ohT"/>
+                <outlet property="noteTextView" destination="lEd-xT-uic" id="4k2-S6-wv2"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>

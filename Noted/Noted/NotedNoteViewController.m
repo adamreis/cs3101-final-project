@@ -14,7 +14,7 @@
 
 @property (strong, nonatomic) Note *note;
 @property (strong, nonatomic) NSString *filePath;
-@property (weak, nonatomic) IBOutlet UITextView *noteTextField;
+@property (weak, nonatomic) IBOutlet UITextView *noteTextView;
 
 @end
 
@@ -50,54 +50,65 @@
     }
     
     self.title = self.note.title;
-    self.noteTextField.text = self.note.text;
+    self.noteTextView.text = self.note.text;
 
 
-//    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-//    [center addObserver:self selector:@selector(keyboardDisappeared) name:UIKeyboardWillHideNotification object:nil];
-//    [center addObserver:self selector:@selector(keyboardAppeared) name:UIKeyboardWillShowNotification object:nil];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self selector:@selector(keyboardDisappeared) name:UIKeyboardWillHideNotification object:nil];
+    [center addObserver:self selector:@selector(keyboardAppeared) name:UIKeyboardWillShowNotification object:nil];
     
-    [self.noteTextField addKeyboardPanningWithActionHandler:^(CGRect keyboardFrameInView) {
-        // Move interface objects accordingly
-        // Animation block is handled for you
-        self.noteTextField.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, keyboardFrameInView.origin.y+62);
-    }];
+//    self.noteTextField.keyboardTriggerOffset = -216.0f;    // Input view frame height
+//    UITextView *textField = self.noteTextView;
+    
+//    [self.noteTextView addKeyboardPanningWithActionHandler:^(CGRect keyboardFrameInView) {
+//        // Move interface objects accordingly
+//        // Animation block is handled for you
+//
+//        CGRect textFieldFrame = textField.frame;
+//        textFieldFrame.size.height = keyboardFrameInView.origin.y;
+//        textField.frame = textFieldFrame;
+//        
+////        
+////        self.noteTextField.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, keyboardFrameInView.origin.y);
+//////        self.noteTextField.frame.size.height = keyboardFrameInView.origin.y;
+//        NSLog(@"this thingy was called: %f", keyboardFrameInView.origin.y);
+//    }];
 }
 
 - (void)viewDidLayoutSubviews{
     [super viewDidLayoutSubviews];
-    self.noteTextField.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
+    self.noteTextView.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
 }
 
-//-(void) keyboardDisappeared
-//{
-//    [UIView beginAnimations:@"animate" context:nil];
-//    [UIView setAnimationDuration:0.2f];
-////    [UIView setAnimationBeginsFromCurrentState: NO];
-////    self.view.frame
-//    self.noteTextField.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
-//    [UIView commitAnimations];
-//}
+-(void) keyboardDisappeared
+{
+    [UIView beginAnimations:@"animate" context:nil];
+    [UIView setAnimationDuration:0.2f];
+//    [UIView setAnimationBeginsFromCurrentState: NO];
+//    self.view.frame
+    self.noteTextView.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
+    [UIView commitAnimations];
+}
 
-//-(void) keyboardAppeared
-//{
-//    [UIView beginAnimations:@"animate" context:nil];
-//    [UIView setAnimationDuration:0.2f];
-////    [UIView setAnimationBeginsFromCurrentState: NO];
-////    self.view.frame
-//    self.noteTextField.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height-216);
-//    [UIView commitAnimations];
-//}
+-(void) keyboardAppeared
+{
+    [UIView beginAnimations:@"animate" context:nil];
+    [UIView setAnimationDuration:0.2f];
+//    [UIView setAnimationBeginsFromCurrentState: NO];
+//    self.view.frame
+    self.noteTextView.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height-218);
+    [UIView commitAnimations];
+}
 
 
 - (void)viewWillDisappear:(BOOL)animated {
     if (animated) {
-        self.note.text = self.noteTextField.text;
+        self.note.text = self.noteTextView.text;
         [NSKeyedArchiver archiveRootObject:self.note toFile:self.filePath];
         NSLog(@"saved note to: %@", self.filePath);
         [self.delegate inputController:self didFinishWithNote:self.note];
     }
-    
+    [self.noteTextView removeKeyboardControl];
     [super viewDidDisappear:animated];
 }
 
