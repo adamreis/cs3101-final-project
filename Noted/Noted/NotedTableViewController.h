@@ -10,6 +10,4 @@
 
 @interface NotedTableViewController : UITableViewController
 
-- (instancetype)initWithNotes: (NSMutableArray *)notes;
-
 @end

@@ -15,27 +15,27 @@
     [aCoder encodeObject:self.title forKey:@"title"];
     [aCoder encodeObject:self.text forKey:@"text"];
     [aCoder encodeInteger:self.index forKey:@"index"];
-    [aCoder encodeObject:self.path forKey:@"path"];
+    [aCoder encodeObject:self.uuid forKey:@"uuid"];
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
     NSString *title = [aDecoder decodeObjectForKey:@"title"];
     NSString *text = [aDecoder decodeObjectForKey:@"text"];
-    NSString *path = [aDecoder decodeObjectForKey:@"path"];
+    NSString *uuid = [aDecoder decodeObjectForKey:@"uuid"];
     NSInteger index = [aDecoder decodeIntegerForKey:@"index"];
     
-    return [self initWithTitle:title text:text index:index path:path];
+    return [self initWithTitle:title text:text index:index uuid:uuid];
     
 }
 
-- (id)initWithTitle:(NSString *)title text:(NSString *)text index:(NSInteger)index path:(NSString *)path
+- (id)initWithTitle:(NSString *)title text:(NSString *)text index:(NSInteger)index uuid:(NSString *)uuid
 {
     self = [super init];
     self.title = title;
     self.text = text;
     self.index = index;
-    self.path = path;
+    self.uuid = uuid;
     
     return self;
 }

@@ -18,12 +18,21 @@
 
 @implementation NotedTableViewController
 
-
-- (instancetype)initWithNotes: (NSMutableArray *)notes
+- (instancetype) init
 {
-    if (self = [self initWithNibName:nil bundle:nil]) {
-        self.notes = notes;
+    self = [super init];
+    
+    NSArray *directories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documents = [directories firstObject];
+    NSString *filePathNotes = [documents stringByAppendingPathComponent:@"notes.plist"];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:filePathNotes]) {
+        NSData *data = [NSData dataWithContentsOfFile:filePathNotes];
+        self.notes = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    } else {
+        self.notes = [[NSMutableArray alloc] init];
     }
+    
     return self;
 }
 
@@ -49,23 +58,22 @@
     if (buttonIndex == 1) {
         UITextField * alertTextField = [alertView textFieldAtIndex:0];
         
+        Note *newNote = [[Note alloc] initWithTitle:alertTextField.text text:@"" index:self.notes.count uuid:[[NSUUID UUID] UUIDString]];
+        
+        
         NSArray *directories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documents = [directories firstObject];
-        NSString *uuid = [[NSUUID UUID] UUIDString];
-        NSString *filePathNewNote = [documents stringByAppendingPathComponent:[uuid stringByAppendingPathExtension:@"plist"]];
+        NSString *filePathNewNote = [documents stringByAppendingPathComponent:[newNote.uuid stringByAppendingPathExtension:@"plist"]];
         NSString *filePathNotes = [documents stringByAppendingPathComponent:@"notes.plist"];
-        
-        Note *newNote = [[Note alloc] initWithTitle:alertTextField.text text:@"" index:self.notes.count path:filePathNewNote];
 
-        [self.notes addObject:newNote];
-        [self.tableView reloadData];
+        [self.notes addObject:@[newNote.title, newNote.uuid]];
         
         [NSKeyedArchiver archiveRootObject:newNote toFile:filePathNewNote];
-        [NSKeyedArchiver archiveRootObject:self.notes toFile:filePathNotes]; 
+        [NSKeyedArchiver archiveRootObject:self.notes toFile:filePathNotes];
+
+        [self.tableView reloadData];
         
-        
-        
-        NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNotePath:newNote.path];
+        NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNoteID:newNote.uuid];
         noteVC.delegate = self;
         [self.navigationController pushViewController:noteVC animated:YES];
     }
@@ -98,16 +106,14 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"reusableNoteCell"];
     }
     
-    Note *noteObject = self.notes[indexPath.row];
-    cell.textLabel.text = noteObject.title;
+    cell.textLabel.text = [[self.notes objectAtIndex:indexPath.row] objectAtIndex:0];
     
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    Note *note = [self.notes objectAtIndex:indexPath.row];
-    NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNotePath:note.path];
+    NotedNoteViewController *noteVC = [[NotedNoteViewController alloc ] initWithNoteID:[[self.notes objectAtIndex:indexPath.row] objectAtIndex:1]];
     noteVC.delegate = self;
     [self.navigationController pushViewController:noteVC animated:YES];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -115,7 +121,12 @@
 
 - (void)inputController:(NotedNoteViewController *)controller didFinishWithNote:(Note *)note
 {
-    [self.notes replaceObjectAtIndex:note.index withObject:note];
+    [self.notes replaceObjectAtIndex:note.index withObject:@[note.title, note.uuid]];
+    
+    NSArray *directories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documents = [directories firstObject];
+    NSString *filePathNotes = [documents stringByAppendingPathComponent:@"notes.plist"];
+    [NSKeyedArchiver archiveRootObject:self.notes toFile:filePathNotes];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {

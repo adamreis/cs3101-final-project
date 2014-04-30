@@ -15,25 +15,13 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    NSArray *directories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documents = [directories firstObject];
-    NSString *filePathNotes = [documents stringByAppendingPathComponent:@"notes.plist"];
-    
-    NSMutableArray *notes;
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:filePathNotes]) {
-        NSData *data = [NSData dataWithContentsOfFile:filePathNotes];
-        notes = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    } else {
-        notes = [[NSMutableArray alloc] init];
-    }
-    
+        
     // Save random thing to documents, just to check
 //    NSString *i = @"astdf";
 //    [i writeToFile:filePathNotes atomically:YES encoding:NSASCIIStringEncoding error:nil];
     
     
-    NotedTableViewController *tableVC = [[NotedTableViewController alloc] initWithNotes:notes];
+    NotedTableViewController *tableVC = [[NotedTableViewController alloc] init];
     UINavigationController *navController = [[UINavigationController alloc]initWithRootViewController:tableVC];
     
     self.window.rootViewController = navController;

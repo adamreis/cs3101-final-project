@@ -19,7 +19,7 @@
 
 @interface NotedNoteViewController : UIViewController
 
-- (instancetype)initWithNotePath:(NSString *)path;
+- (instancetype)initWithNoteID:(NSString *)uuid;
 @property (weak, nonatomic) id<NotedNoteViewControllerDelegate> delegate;
 
 @end
