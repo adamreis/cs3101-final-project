@@ -17,7 +17,7 @@
 
 @end
 
-@interface NotedNoteViewController : UIViewController
+@interface NotedNoteViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
 
 - (instancetype)initWithNoteID:(NSString *)uuid;
 @property (weak, nonatomic) id<NotedNoteViewControllerDelegate> delegate;
