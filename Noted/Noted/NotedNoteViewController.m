@@ -9,6 +9,7 @@
 #import "NotedNoteViewController.h"
 #import "Note.h"
 #import "DAKeyboardControl.h"
+#import "NotedPhotoCell.h"
 
 @interface NotedNoteViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
 
@@ -40,6 +41,10 @@
             self.note.index = -1; // indicate an error
             NSLog(@"Cannot find file at: %@", self.filePath);
         }
+        
+        NSString *testPhotoPath = [documents stringByAppendingString:[@"test" stringByAppendingPathExtension:@"jpg"]];
+        UIImage *testImage = [UIImage imageWithContentsOfFile:testPhotoPath];
+        [self.photos addObject:testImage];
     }
     return self;
 }
@@ -60,12 +65,13 @@
     self.title = self.note.title;
     self.noteTextView.text = self.note.text;
 
+    [self.photoCollectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"photoCell"];
 
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center addObserver:self selector:@selector(keyboardDisappeared) name:UIKeyboardWillHideNotification object:nil];
     [center addObserver:self selector:@selector(keyboardAppeared) name:UIKeyboardWillShowNotification object:nil];
     
-    [self.photoCollectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"photoCell"];
+//    [self.photoCollectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"photoCell"];
     
 //    self.noteTextField.keyboardTriggerOffset = -216.0f;    // Input view frame height
 //    UITextView *textField = self.noteTextView;
@@ -134,7 +140,7 @@
 #pragma mark - UICollectionView Datasource
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return [self.photos count] +1;
+    return [self.photos count] + 2;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
@@ -142,13 +148,18 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
+    NotedPhotoCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
+
 //    if(!cell) {
 //        if (!cell) {
 //            cell = [[UICollectionViewCell alloc] init];
 //        }
 //    }
     cell.backgroundColor = [UIColor blueColor];
+    if (indexPath.row < [self.photos count]) {
+//        UIImageView  *imageView = [UIImageView initWithImage:self.photos objectAtIndex:indexPath.row];
+        cell.image.image = [self.photos objectAtIndex:indexPath.row];
+    }
     return cell;
 }
 
