@@ -19,8 +19,6 @@
 @property (weak, nonatomic) IBOutlet UITextView *noteTextView;
 @property (weak, nonatomic) IBOutlet UICollectionView *photoCollectionView;
 
-
-
 @end
 
 @implementation NotedNoteViewController
@@ -32,7 +30,6 @@
         NSArray *directories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documents = [directories firstObject];
         self.filePath = [documents stringByAppendingPathComponent:[uuid stringByAppendingPathExtension:@"plist"]];
-        NSLog(@"Saved original filepath: %@", self.filePath);
         if ([[NSFileManager defaultManager] fileExistsAtPath:self.filePath]) {
             NSData *data = [NSData dataWithContentsOfFile:self.filePath];
             self.note = [NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -42,9 +39,13 @@
             NSLog(@"Cannot find file at: %@", self.filePath);
         }
         
-        NSString *testPhotoPath = [documents stringByAppendingString:[@"test" stringByAppendingPathExtension:@"jpg"]];
+        self.photos = [[NSMutableArray alloc] init];
+        NSString *testPhotoPath = [documents stringByAppendingPathComponent:@"test.jpg"];
         UIImage *testImage = [UIImage imageWithContentsOfFile:testPhotoPath];
         [self.photos addObject:testImage];
+        
+        //maybe this will work?
+        
     }
     return self;
 }
@@ -139,8 +140,8 @@
 
 #pragma mark - UICollectionView Datasource
 
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return [self.photos count] + 2;
+- (NSInteger)colleectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return [self.photos count];
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
@@ -155,11 +156,11 @@
 //            cell = [[UICollectionViewCell alloc] init];
 //        }
 //    }
-    cell.backgroundColor = [UIColor blueColor];
-    if (indexPath.row < [self.photos count]) {
-//        UIImageView  *imageView = [UIImageView initWithImage:self.photos objectAtIndex:indexPath.row];
-        cell.image.image = [self.photos objectAtIndex:indexPath.row];
-    }
+//    cell.backgroundColor = [UIColor blueColor];
+//    if (indexPath.row < [self.photos count]) {
+////        UIImageView  *imageView = [UIImageView initWithImage:self.photos objectAtIndex:indexPath.row];
+//        [cell.image setImage:[self.photos objectAtIndex:indexPath.row]];
+//    }
     return cell;
 }
 
@@ -175,7 +176,7 @@
 
 #pragma mark - UICollectionViewDelegateFlowLayout
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(100, 100);
+    return CGSizeMake(55, 55);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
